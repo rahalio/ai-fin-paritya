@@ -1,0 +1,761 @@
+openapi: 3.0.3
+info:
+  title: Paritya
+  version: 0.1.0
+  description: Supervisory readiness and fairness governance for inclusive-finance AI in LMICs.
+  x-product-slug: ai-fin-paritya
+  x-source: ai-in-financial/AI_Report_WF/
+servers:
+- url: https://api.example.com
+tags:
+- name: UseCases
+  description: AI use-case registry
+- name: Dossiers
+  description: Readiness dossiers
+- name: Gates
+  description: Supervisory gate decisions
+- name: Monitoring
+  description: Fairness monitoring metrics
+- name: Cases
+  description: Investigation cases
+- name: Playbooks
+  description: South-South playbooks
+- name: EvidencePacks
+  description: Supervisor evidence packs
+paths:
+  /v1/use-cases:
+    get:
+      operationId: listUseCases
+      tags:
+      - UseCases
+      security: &id001
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeUseCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createUseCase
+      tags:
+      - UseCases
+      security: *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UseCaseCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeUseCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/use-cases/{useCaseId}:
+    parameters:
+    - $ref: '#/components/parameters/UseCaseId'
+    get:
+      operationId: getUseCase
+      tags:
+      - UseCases
+      security: *id001
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeUseCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /v1/dossiers:
+    get:
+      operationId: listDossiers
+      tags:
+      - Dossiers
+      security: *id001
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeReadinessDossier'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: createDossier
+      tags:
+      - Dossiers
+      security: *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadinessDossierCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeReadinessDossier'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/use-cases/{useCaseId}/gates:
+    parameters:
+    - $ref: '#/components/parameters/UseCaseId'
+    post:
+      operationId: createGateDecision
+      tags:
+      - Gates
+      security: *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GateDecisionCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeGateDecision'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/monitoring/metrics:
+    get:
+      operationId: listMonitoringMetrics
+      tags:
+      - Monitoring
+      security:
+      - ApiKeyAuth: []
+      - BearerAuth: []
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeMonitoringMetric'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      operationId: submitMonitoringMetric
+      tags:
+      - Monitoring
+      security:
+      - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MonitoringMetricCreate'
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeMonitoringMetric'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/UnprocessableEntity'
+  /v1/cases:
+    get:
+      operationId: listCases
+      tags:
+      - Cases
+      security: *id001
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopeCase'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/playbooks:
+    get:
+      operationId: listPlaybooks
+      tags:
+      - Playbooks
+      security: *id001
+      parameters:
+      - $ref: '#/components/parameters/Cursor'
+      - $ref: '#/components/parameters/Limit'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEnvelopePlaybook'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /v1/evidence-packs:
+    post:
+      operationId: createEvidencePack
+      tags:
+      - EvidencePacks
+      security: *id001
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - useCaseId
+              properties:
+                useCaseId:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DataEnvelopeEvidencePack'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  parameters:
+    Cursor:
+      name: cursor
+      in: query
+      schema:
+        type: string
+    Limit:
+      name: limit
+      in: query
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 200
+        default: 50
+    UseCaseId:
+      name: useCaseId
+      in: path
+      required: true
+      schema:
+        type: string
+  responses:
+    Unauthorized:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    NotFound:
+      description: Not found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+    UnprocessableEntity:
+      description: Unprocessable entity
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Problem'
+  schemas:
+    ResponseMeta:
+      type: object
+      required:
+      - requestId
+      - timestamp
+      properties:
+        requestId:
+          type: string
+        timestamp:
+          type: string
+          format: date-time
+    Problem:
+      type: object
+      required:
+      - type
+      - title
+      - status
+      properties:
+        type:
+          type: string
+          format: uri
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+    UseCase:
+      type: object
+      required:
+      - id
+      - providerId
+      - category
+      - title
+      - status
+      properties:
+        id:
+          type: string
+        providerId:
+          type: string
+        category:
+          type: string
+          enum:
+          - credit
+          - advice
+          - fraud
+          - collections
+          - other
+        title:
+          type: string
+        status:
+          type: string
+          enum:
+          - draft
+          - in_review
+          - sandboxed
+          - production
+          - revoked
+    UseCaseCreate:
+      type: object
+      required:
+      - providerId
+      - category
+      - title
+      properties:
+        providerId:
+          type: string
+        category:
+          type: string
+          enum:
+          - credit
+          - advice
+          - fraud
+          - collections
+          - other
+        title:
+          type: string
+        description:
+          type: string
+    ReadinessDossier:
+      type: object
+      required:
+      - id
+      - useCaseId
+      - status
+      properties:
+        id:
+          type: string
+        useCaseId:
+          type: string
+        coverageGaps:
+          type: array
+          items:
+            type: string
+        appealPathId:
+          type: string
+        status:
+          type: string
+          enum:
+          - incomplete
+          - submitted
+          - accepted
+    ReadinessDossierCreate:
+      type: object
+      required:
+      - useCaseId
+      properties:
+        useCaseId:
+          type: string
+        coverageGaps:
+          type: array
+          items:
+            type: string
+        dataProvenance:
+          type: string
+        appealPathId:
+          type: string
+    GateDecision:
+      type: object
+      required:
+      - id
+      - useCaseId
+      - outcome
+      properties:
+        id:
+          type: string
+        useCaseId:
+          type: string
+        outcome:
+          type: string
+          enum:
+          - approve
+          - conditional
+          - reject
+          - sandbox
+          - revoke
+        conditions:
+          type: array
+          items:
+            type: string
+        decidedBy:
+          type: string
+    GateDecisionCreate:
+      type: object
+      required:
+      - outcome
+      properties:
+        outcome:
+          type: string
+          enum:
+          - approve
+          - conditional
+          - reject
+          - sandbox
+          - revoke
+        conditions:
+          type: array
+          items:
+            type: string
+        expiresAt:
+          type: string
+          format: date-time
+    MonitoringMetric:
+      type: object
+      required:
+      - id
+      - useCaseId
+      - name
+      - value
+      - thresholdBreached
+      properties:
+        id:
+          type: string
+        useCaseId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+        thresholdBreached:
+          type: boolean
+        observedAt:
+          type: string
+          format: date-time
+    MonitoringMetricCreate:
+      type: object
+      required:
+      - useCaseId
+      - name
+      - value
+      properties:
+        useCaseId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+        segment:
+          type: string
+    Case:
+      type: object
+      required:
+      - id
+      - useCaseId
+      - type
+      - status
+      properties:
+        id:
+          type: string
+        useCaseId:
+          type: string
+        type:
+          type: string
+          enum:
+          - fairness_breach
+          - appeal
+          - sandbox_expiry
+        status:
+          type: string
+          enum:
+          - open
+          - investigating
+          - closed
+        summary:
+          type: string
+    Playbook:
+      type: object
+      required:
+      - id
+      - category
+      - title
+      properties:
+        id:
+          type: string
+        category:
+          type: string
+        title:
+          type: string
+        summary:
+          type: string
+    EvidencePack:
+      type: object
+      required:
+      - id
+      - useCaseId
+      properties:
+        id:
+          type: string
+        useCaseId:
+          type: string
+        downloadUrl:
+          type: string
+          format: uri
+    DataEnvelopeUseCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/UseCase'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeUseCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/UseCase'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeReadinessDossier:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/ReadinessDossier'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeReadinessDossier:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/ReadinessDossier'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeGateDecision:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/GateDecision'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeGateDecision:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/GateDecision'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeMonitoringMetric:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/MonitoringMetric'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeMonitoringMetric:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/MonitoringMetric'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/Case'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeCase:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Case'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopePlaybook:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/Playbook'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopePlaybook:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Playbook'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    DataEnvelopeEvidencePack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          $ref: '#/components/schemas/EvidencePack'
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
+    ListEnvelopeEvidencePack:
+      type: object
+      required:
+      - data
+      - meta
+      properties:
+        data:
+          type: object
+          required:
+          - items
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/EvidencePack'
+            nextCursor:
+              type: string
+        meta:
+          $ref: '#/components/schemas/ResponseMeta'
