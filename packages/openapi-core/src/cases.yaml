@@ -1,0 +1,129 @@
+openapi: 3.1.0
+info:
+  title: Cases API
+  version: 0.1.0
+  description: Investigation and remediation cases for breaches, appeals, and sandbox expiry.
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: cas
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: Cases
+    description: Investigation cases
+paths:
+  /v1/cases:
+    get:
+      operationId: listCases
+      summary: List cases
+      tags: [Cases]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: status
+          in: query
+          schema:
+            $ref: ./cases.schemas.yaml#/components/schemas/CaseStatus
+        - name: type
+          in: query
+          schema:
+            $ref: ./cases.schemas.yaml#/components/schemas/CaseType
+        - name: useCaseId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Cases
+          content:
+            application/json:
+              schema:
+                $ref: ./cases.schemas.yaml#/components/schemas/CaseListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createCase
+      summary: Create case
+      tags: [Cases]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./cases.schemas.yaml#/components/schemas/CaseCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./cases.schemas.yaml#/components/schemas/CaseResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/cases/{caseId}:
+    parameters:
+      - name: caseId
+        in: path
+        required: true
+        schema:
+          $ref: ./cases.schemas.yaml#/components/schemas/CaseId
+    get:
+      operationId: getCase
+      summary: Get case
+      tags: [Cases]
+      responses:
+        '200':
+          description: Case
+          content:
+            application/json:
+              schema:
+                $ref: ./cases.schemas.yaml#/components/schemas/CaseResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    patch:
+      operationId: updateCase
+      summary: Update case
+      tags: [Cases]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./cases.schemas.yaml#/components/schemas/CaseUpdateRequest
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ./cases.schemas.yaml#/components/schemas/CaseResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

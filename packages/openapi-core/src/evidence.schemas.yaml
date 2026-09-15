@@ -1,0 +1,84 @@
+openapi: 3.1.0
+info:
+  title: Evidence schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    EvidencePackId:
+      type: string
+      pattern: '^ep_[0-9A-HJKMNP-TV-Z]{26}$'
+    EvidencePackStatus:
+      type: string
+      enum: [pending, ready, failed]
+
+    EvidencePack:
+      type: object
+      required: [id, useCaseId, status, includesRawPii, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/EvidencePackId'
+        useCaseId:
+          type: string
+        status:
+          $ref: '#/components/schemas/EvidencePackStatus'
+        includesRawPii:
+          type: boolean
+          description: Default false — aggregated only (BR-6).
+        rawPiiAuditReason:
+          type: string
+          description: Required when includesRawPii is true.
+        downloadUrl:
+          type: string
+          format: uri
+        civilSocietySummary:
+          type: string
+          description: Non-confidential summary for BR-10 portal.
+        createdAt:
+          type: string
+          format: date-time
+        readyAt:
+          type: string
+          format: date-time
+
+    EvidencePackCreateRequest:
+      type: object
+      required: [useCaseId]
+      properties:
+        useCaseId:
+          type: string
+        includesRawPii:
+          type: boolean
+          default: false
+        rawPiiAuditReason:
+          type: string
+        includeCivilSocietySummary:
+          type: boolean
+          default: true
+
+    EvidencePackListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/EvidencePack'
+
+    EvidencePackResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/EvidencePack'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    EvidencePackListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/EvidencePackListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

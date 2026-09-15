@@ -1,0 +1,189 @@
+openapi: 3.1.0
+info:
+  title: Gates API
+  version: 0.1.0
+  description: |
+    Immutable supervisory gate stamps and time-boxed sandbox permits (BR-5, BR-11).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: gat
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: Gates
+    description: Gate decisions
+  - name: Sandboxes
+    description: Sandbox permits
+paths:
+  /v1/use-cases/{useCaseId}/gates:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      operationId: listGateDecisions
+      summary: List gate decisions
+      tags: [Gates]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+      responses:
+        '200':
+          description: Gate decisions
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/GateDecisionListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createGateDecision
+      summary: Stamp an immutable gate decision
+      tags: [Gates]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./gates.schemas.yaml#/components/schemas/GateDecisionCreateRequest
+      responses:
+        '201':
+          description: Stamped
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/GateDecisionResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '403':
+          $ref: ./common/responses.yaml#/components/responses/Forbidden
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/sandboxes:
+    get:
+      operationId: listSandboxPermits
+      summary: List sandbox permits
+      tags: [Sandboxes]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: status
+          in: query
+          schema:
+            $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitStatus
+      responses:
+        '200':
+          description: Sandbox permits
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/sandboxes/{sandboxPermitId}:
+    parameters:
+      - name: sandboxPermitId
+        in: path
+        required: true
+        schema:
+          $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitId
+    get:
+      operationId: getSandboxPermit
+      summary: Get sandbox permit
+      tags: [Sandboxes]
+      responses:
+        '200':
+          description: Permit
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/sandboxes/{sandboxPermitId}/extend:
+    post:
+      operationId: extendSandboxPermit
+      summary: Extend sandbox permit
+      tags: [Sandboxes]
+      parameters:
+        - name: sandboxPermitId
+          in: path
+          required: true
+          schema:
+            $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitId
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./gates.schemas.yaml#/components/schemas/SandboxExtendRequest
+      responses:
+        '200':
+          description: Extended
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/sandboxes/{sandboxPermitId}/revoke:
+    post:
+      operationId: revokeSandboxPermit
+      summary: Revoke sandbox permit
+      tags: [Sandboxes]
+      parameters:
+        - name: sandboxPermitId
+          in: path
+          required: true
+          schema:
+            $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitId
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Revoked
+          content:
+            application/json:
+              schema:
+                $ref: ./gates.schemas.yaml#/components/schemas/SandboxPermitResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

@@ -1,0 +1,109 @@
+openapi: 3.1.0
+info:
+  title: Appeals schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    AppealPathId:
+      type: string
+      pattern: '^ap_[0-9A-HJKMNP-TV-Z]{26}$'
+    AppealPathStatus:
+      type: string
+      enum: [draft, active, retired]
+
+    AppealPath:
+      type: object
+      required: [id, useCaseId, modelVersion, status, slaHours, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/AppealPathId'
+        useCaseId:
+          type: string
+        modelVersion:
+          type: string
+        status:
+          $ref: '#/components/schemas/AppealPathStatus'
+        slaHours:
+          type: integer
+          minimum: 1
+          description: Target time-to-resolution hours (BR-3).
+        explanationTemplate:
+          type: string
+          description: Plain-language explanation template for adverse decisions.
+        overrideChannels:
+          type: array
+          items:
+            type: string
+        humanOwnerRole:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    AppealPathCreateRequest:
+      type: object
+      required: [useCaseId, modelVersion, slaHours]
+      properties:
+        useCaseId:
+          type: string
+        modelVersion:
+          type: string
+        slaHours:
+          type: integer
+          minimum: 1
+        explanationTemplate:
+          type: string
+        overrideChannels:
+          type: array
+          items:
+            type: string
+        humanOwnerRole:
+          type: string
+
+    AppealPathUpdateRequest:
+      type: object
+      properties:
+        slaHours:
+          type: integer
+          minimum: 1
+        explanationTemplate:
+          type: string
+        overrideChannels:
+          type: array
+          items:
+            type: string
+        humanOwnerRole:
+          type: string
+        status:
+          $ref: '#/components/schemas/AppealPathStatus'
+
+    AppealPathListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppealPath'
+
+    AppealPathResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AppealPath'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    AppealPathListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/AppealPathListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

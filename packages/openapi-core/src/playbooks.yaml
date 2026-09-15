@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Playbooks API
+  version: 0.1.0
+  description: South-South anonymised readiness playbook library (BR-12).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: plb
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: Playbooks
+    description: Playbook templates
+paths:
+  /v1/playbooks:
+    get:
+      operationId: listPlaybooks
+      summary: List playbooks
+      tags: [Playbooks]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: useCaseType
+          in: query
+          schema:
+            $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookUseCaseType
+      responses:
+        '200':
+          description: Playbooks
+          content:
+            application/json:
+              schema:
+                $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createPlaybook
+      summary: Create playbook
+      tags: [Playbooks]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/playbooks/{playbookId}:
+    get:
+      operationId: getPlaybook
+      summary: Get playbook
+      tags: [Playbooks]
+      parameters:
+        - name: playbookId
+          in: path
+          required: true
+          schema:
+            $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookId
+      responses:
+        '200':
+          description: Playbook
+          content:
+            application/json:
+              schema:
+                $ref: ./playbooks.schemas.yaml#/components/schemas/PlaybookResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

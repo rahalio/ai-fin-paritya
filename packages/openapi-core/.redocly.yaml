@@ -1,0 +1,36 @@
+apis:
+  identity:
+    root: src/identity.yaml
+  usecases:
+    root: src/usecases.yaml
+  dossiers:
+    root: src/dossiers.yaml
+  gates:
+    root: src/gates.yaml
+  appeals:
+    root: src/appeals.yaml
+  monitoring:
+    root: src/monitoring.yaml
+  cases:
+    root: src/cases.yaml
+  playbooks:
+    root: src/playbooks.yaml
+  evidence:
+    root: src/evidence.yaml
+
+extends:
+  - recommended
+
+rules:
+  no-unused-components: off
+  operation-4xx-response: warn
+  info-license: off
+  info-license-url: off
+  tag-description: off
+  operation-operationId: error
+  no-invalid-media-type-examples: off
+
+theme:
+  openapi:
+    generateCodeSamples:
+      languages: []

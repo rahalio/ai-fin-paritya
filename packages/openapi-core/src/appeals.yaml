@@ -1,0 +1,127 @@
+openapi: 3.1.0
+info:
+  title: Appeals API
+  version: 0.1.0
+  description: Human appeal and explanation registry by model version (BR-3).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: apl
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: Appeals
+    description: Appeal paths and explanation templates
+paths:
+  /v1/appeals:
+    get:
+      operationId: listAppealPaths
+      summary: List appeal paths
+      tags: [Appeals]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: useCaseId
+          in: query
+          schema:
+            type: string
+        - name: modelVersion
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Appeal paths
+          content:
+            application/json:
+              schema:
+                $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createAppealPath
+      summary: Create appeal path
+      tags: [Appeals]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/appeals/{appealPathId}:
+    parameters:
+      - name: appealPathId
+        in: path
+        required: true
+        schema:
+          $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathId
+    get:
+      operationId: getAppealPath
+      summary: Get appeal path
+      tags: [Appeals]
+      responses:
+        '200':
+          description: Appeal path
+          content:
+            application/json:
+              schema:
+                $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    patch:
+      operationId: updateAppealPath
+      summary: Update appeal path
+      tags: [Appeals]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathUpdateRequest
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ./appeals.schemas.yaml#/components/schemas/AppealPathResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

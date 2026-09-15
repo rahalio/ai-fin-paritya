@@ -1,0 +1,136 @@
+openapi: 3.1.0
+info:
+  title: UseCases API
+  version: 0.1.0
+  description: |
+    Registry of in-scope AI use cases (credit, advice, fraud, collections)
+    before production traffic (BR-1).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: ucs
+servers:
+  - url: https://api.paritya.local
+    description: Local / product API
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: UseCases
+    description: AI use-case registry
+paths:
+  /v1/use-cases:
+    get:
+      operationId: listUseCases
+      tags: [UseCases]
+      summary: List use cases for the current tenant
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: status
+          in: query
+          schema:
+            $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseStatus
+        - name: category
+          in: query
+          schema:
+            $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseCategory
+      responses:
+        '200':
+          description: Use cases
+          content:
+            application/json:
+              schema:
+                $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createUseCase
+      summary: Register a use case
+      tags: [UseCases]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseResponse
+        '400':
+          $ref: ./common/responses.yaml#/components/responses/BadRequest
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '409':
+          $ref: ./common/responses.yaml#/components/responses/Conflict
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/use-cases/{useCaseId}:
+    parameters:
+      - name: useCaseId
+        in: path
+        required: true
+        schema:
+          $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseId
+    get:
+      operationId: getUseCase
+      tags: [UseCases]
+      summary: Get a use case
+      responses:
+        '200':
+          description: Use case
+          content:
+            application/json:
+              schema:
+                $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    patch:
+      operationId: updateUseCase
+      summary: Update use-case metadata
+      tags: [UseCases]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseUpdateRequest
+      responses:
+        '200':
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: ./usecases.schemas.yaml#/components/schemas/UseCaseResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

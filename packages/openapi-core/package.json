@@ -1,0 +1,18 @@
+{
+  "name": "@paritya/openapi-core",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OpenAPI contracts for Paritya (common + product domains)",
+  "scripts": {
+    "lint:domains": "redocly lint",
+    "bundle:domains": "mkdir -p src/.bundled && redocly bundle identity --output src/.bundled/identity.openapi.yaml && redocly bundle identity --output src/.bundled/identity.json && redocly bundle usecases --output src/.bundled/usecases.openapi.yaml && redocly bundle usecases --output src/.bundled/usecases.json && redocly bundle dossiers --output src/.bundled/dossiers.openapi.yaml && redocly bundle dossiers --output src/.bundled/dossiers.json && redocly bundle gates --output src/.bundled/gates.openapi.yaml && redocly bundle gates --output src/.bundled/gates.json && redocly bundle appeals --output src/.bundled/appeals.openapi.yaml && redocly bundle appeals --output src/.bundled/appeals.json && redocly bundle monitoring --output src/.bundled/monitoring.openapi.yaml && redocly bundle monitoring --output src/.bundled/monitoring.json && redocly bundle cases --output src/.bundled/cases.openapi.yaml && redocly bundle cases --output src/.bundled/cases.json && redocly bundle playbooks --output src/.bundled/playbooks.openapi.yaml && redocly bundle playbooks --output src/.bundled/playbooks.json && redocly bundle evidence --output src/.bundled/evidence.openapi.yaml && redocly bundle evidence --output src/.bundled/evidence.json",
+    "lint": "pnpm run lint:domains",
+    "bundle": "pnpm run bundle:domains"
+  },
+  "devDependencies": {
+    "@redocly/cli": "^1.34.0"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

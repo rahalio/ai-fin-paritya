@@ -1,0 +1,192 @@
+openapi: 3.1.0
+info:
+  title: Dossiers API
+  version: 0.1.0
+  description: |
+    Readiness dossiers, LMIC checklists, and language/literacy access tests (BR-1, BR-2, BR-7, BR-8, BR-9).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: dos
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: Dossiers
+    description: Readiness dossiers and checklists
+  - name: LanguageTests
+    description: Language and literacy access tests
+paths:
+  /v1/dossiers:
+    get:
+      operationId: listDossiers
+      summary: List dossiers
+      tags: [Dossiers]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: useCaseId
+          in: query
+          schema:
+            type: string
+        - name: status
+          in: query
+          schema:
+            $ref: ./dossiers.schemas.yaml#/components/schemas/DossierStatus
+      responses:
+        '200':
+          description: Dossiers
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/ReadinessDossierListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createDossier
+      summary: Create dossier
+      tags: [Dossiers]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./dossiers.schemas.yaml#/components/schemas/ReadinessDossierCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/ReadinessDossierResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/dossiers/{dossierId}:
+    parameters:
+      - name: dossierId
+        in: path
+        required: true
+        schema:
+          $ref: ./dossiers.schemas.yaml#/components/schemas/DossierId
+    get:
+      operationId: getDossier
+      summary: Get dossier
+      tags: [Dossiers]
+      responses:
+        '200':
+          description: Dossier
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/ReadinessDossierResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: submitDossier
+      summary: Submit dossier for gate review
+      tags: [Dossiers]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      responses:
+        '200':
+          description: Submitted
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/ReadinessDossierResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/dossiers/{dossierId}/checklist-items:
+    parameters:
+      - name: dossierId
+        in: path
+        required: true
+        schema:
+          $ref: ./dossiers.schemas.yaml#/components/schemas/DossierId
+    post:
+      operationId: upsertChecklistItem
+      summary: Upsert checklist item
+      tags: [Dossiers]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./dossiers.schemas.yaml#/components/schemas/ChecklistItemUpsertRequest
+      responses:
+        '200':
+          description: Upserted
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/ChecklistItemResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/dossiers/{dossierId}/language-tests:
+    parameters:
+      - name: dossierId
+        in: path
+        required: true
+        schema:
+          $ref: ./dossiers.schemas.yaml#/components/schemas/DossierId
+    post:
+      operationId: createLanguageTest
+      summary: Create language test
+      tags: [LanguageTests]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./dossiers.schemas.yaml#/components/schemas/LanguageTestCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./dossiers.schemas.yaml#/components/schemas/LanguageLiteracyTestResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

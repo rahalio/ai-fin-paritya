@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Monitoring schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    MonitoringMetricId:
+      type: string
+      pattern: '^mm_[0-9A-HJKMNP-TV-Z]{26}$'
+    FairnessBreachId:
+      type: string
+      pattern: '^fb_[0-9A-HJKMNP-TV-Z]{26}$'
+    FairnessBreachStatus:
+      type: string
+      enum: [open, acknowledged, resolved]
+
+    MonitoringMetric:
+      type: object
+      required: [id, useCaseId, name, value, thresholdBreached, observedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/MonitoringMetricId'
+        useCaseId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+        threshold:
+          type: number
+        thresholdBreached:
+          type: boolean
+        segment:
+          type: string
+          description: Population segment (gender, language, geography, etc.).
+        scheduleCron:
+          type: string
+          description: Agreed monitoring schedule (BR-4).
+        observedAt:
+          type: string
+          format: date-time
+
+    MonitoringMetricCreateRequest:
+      type: object
+      required: [useCaseId, name, value]
+      properties:
+        useCaseId:
+          type: string
+        name:
+          type: string
+        value:
+          type: number
+        threshold:
+          type: number
+        segment:
+          type: string
+        scheduleCron:
+          type: string
+        observedAt:
+          type: string
+          format: date-time
+
+    FairnessBreach:
+      type: object
+      required: [id, useCaseId, metricId, status, detectedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/FairnessBreachId'
+        useCaseId:
+          type: string
+        metricId:
+          $ref: '#/components/schemas/MonitoringMetricId'
+        status:
+          $ref: '#/components/schemas/FairnessBreachStatus'
+        summary:
+          type: string
+        caseId:
+          type: string
+          description: Linked investigation case when opened.
+        detectedAt:
+          type: string
+          format: date-time
+
+    FairnessBreachCreateRequest:
+      type: object
+      required: [useCaseId, metricId]
+      properties:
+        useCaseId:
+          type: string
+        metricId:
+          type: string
+        summary:
+          type: string
+
+    MonitoringMetricListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/MonitoringMetric'
+
+    FairnessBreachListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/FairnessBreach'
+
+    MonitoringMetricResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/MonitoringMetric'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    MonitoringMetricListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/MonitoringMetricListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    FairnessBreachResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/FairnessBreach'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    FairnessBreachListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/FairnessBreachListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

@@ -1,0 +1,22 @@
+---
+description: Never commit or push the `.codegen` directory
+globs:
+  - .codegen/**/*
+alwaysApply: true
+---
+
+# `.codegen` must never be committed
+
+- The `.codegen/` directory is **local-only** tooling (zero-codegen + merged config).
+- **Never** `git add`, commit, or push `.codegen/` (or vendored `zero_codegen` paths).
+- `.gitignore` already ignores `.codegen/`, `codegen/`, and `**/zero_codegen/`.
+- On a fresh clone, sync tooling from the scaffold:
+
+```bash
+rsync -a --delete \
+  /Users/nrahal/@code/zero-apps/zero-apps-codegen-scaffold/.codegen/ \
+  .codegen/
+pnpm codegen:paths
+```
+
+- After sync, ensure `package_scope` is `@paritya` in `.codegen/zero-codegen.json` and `.codegen/.zero-codegen-merged.json`.

@@ -1,0 +1,156 @@
+openapi: 3.1.0
+info:
+  title: Gates schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    GateDecisionId:
+      type: string
+      pattern: '^gd_[0-9A-HJKMNP-TV-Z]{26}$'
+    SandboxPermitId:
+      type: string
+      pattern: '^sp_[0-9A-HJKMNP-TV-Z]{26}$'
+    GateOutcome:
+      type: string
+      enum: [approve, conditional, reject, sandbox, revoke]
+    SandboxPermitStatus:
+      type: string
+      enum: [active, expired, revoked, graduated]
+
+    GateDecision:
+      type: object
+      required: [id, useCaseId, outcome, decidedBy, decidedAt, immutable]
+      properties:
+        id:
+          $ref: '#/components/schemas/GateDecisionId'
+        useCaseId:
+          type: string
+        outcome:
+          $ref: '#/components/schemas/GateOutcome'
+        conditions:
+          type: array
+          items:
+            type: string
+        decidedBy:
+          type: string
+          description: Named authority (BR-11).
+        decidedAt:
+          type: string
+          format: date-time
+        expiresAt:
+          type: string
+          format: date-time
+        immutable:
+          type: boolean
+          description: Always true once stamped.
+        rationale:
+          type: string
+
+    GateDecisionCreateRequest:
+      type: object
+      required: [outcome]
+      properties:
+        outcome:
+          $ref: '#/components/schemas/GateOutcome'
+        conditions:
+          type: array
+          items:
+            type: string
+        expiresAt:
+          type: string
+          format: date-time
+        rationale:
+          type: string
+        exitCriteria:
+          type: array
+          items:
+            type: string
+          description: Required when outcome is sandbox.
+
+    SandboxPermit:
+      type: object
+      required: [id, useCaseId, gateDecisionId, status, expiresAt, exitCriteria]
+      properties:
+        id:
+          $ref: '#/components/schemas/SandboxPermitId'
+        useCaseId:
+          type: string
+        gateDecisionId:
+          $ref: '#/components/schemas/GateDecisionId'
+        status:
+          $ref: '#/components/schemas/SandboxPermitStatus'
+        expiresAt:
+          type: string
+          format: date-time
+        exitCriteria:
+          type: array
+          items:
+            type: string
+        extendedAt:
+          type: string
+          format: date-time
+
+    SandboxExtendRequest:
+      type: object
+      required: [expiresAt]
+      properties:
+        expiresAt:
+          type: string
+          format: date-time
+        reason:
+          type: string
+
+    GateDecisionListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/GateDecision'
+
+    SandboxPermitListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/SandboxPermit'
+
+    GateDecisionResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/GateDecision'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    GateDecisionListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/GateDecisionListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    SandboxPermitResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/SandboxPermit'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    SandboxPermitListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/SandboxPermitListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

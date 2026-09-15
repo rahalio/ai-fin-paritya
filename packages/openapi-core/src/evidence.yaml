@@ -1,0 +1,98 @@
+openapi: 3.1.0
+info:
+  title: Evidence API
+  version: 0.1.0
+  description: Supervisor evidence packs without default raw PII (BR-6, BR-10).
+  license:
+    name: Proprietary
+    url: https://paritya.local/license
+  x-domain: evd
+servers:
+  - url: https://api.paritya.local
+security:
+  - bearerAuth: []
+  - apiKey: []
+tags:
+  - name: EvidencePacks
+    description: Evidence pack exports
+paths:
+  /v1/evidence-packs:
+    get:
+      operationId: listEvidencePacks
+      summary: List evidence packs
+      tags: [EvidencePacks]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/Cursor
+        - $ref: ./common/parameters.yaml#/components/parameters/Limit
+        - name: useCaseId
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Packs
+          content:
+            application/json:
+              schema:
+                $ref: ./evidence.schemas.yaml#/components/schemas/EvidencePackListResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+    post:
+      operationId: createEvidencePack
+      summary: Create evidence pack
+      tags: [EvidencePacks]
+      parameters:
+        - $ref: ./common/parameters.yaml#/components/parameters/IdempotencyKey
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: ./evidence.schemas.yaml#/components/schemas/EvidencePackCreateRequest
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: ./evidence.schemas.yaml#/components/schemas/EvidencePackResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '422':
+          $ref: ./common/responses.yaml#/components/responses/UnprocessableEntity
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+  /v1/evidence-packs/{evidencePackId}:
+    get:
+      operationId: getEvidencePack
+      summary: Get evidence pack
+      tags: [EvidencePacks]
+      parameters:
+        - name: evidencePackId
+          in: path
+          required: true
+          schema:
+            $ref: ./evidence.schemas.yaml#/components/schemas/EvidencePackId
+      responses:
+        '200':
+          description: Pack
+          content:
+            application/json:
+              schema:
+                $ref: ./evidence.schemas.yaml#/components/schemas/EvidencePackResponse
+        '401':
+          $ref: ./common/responses.yaml#/components/responses/Unauthorized
+        '404':
+          $ref: ./common/responses.yaml#/components/responses/NotFound
+        default:
+          $ref: ./common/responses.yaml#/components/responses/Problem
+
+components:
+  securitySchemes:
+    apiKey:
+      $ref: ./common/security.yaml#/components/securitySchemes/apiKey
+    bearerAuth:
+      $ref: ./common/security.yaml#/components/securitySchemes/bearerAuth

@@ -1,0 +1,121 @@
+openapi: 3.1.0
+info:
+  title: UseCases schemas
+  version: 0.1.0
+  description: AI use-case registry schemas for Paritya.
+paths: {}
+components:
+  schemas:
+    UseCaseId:
+      type: string
+      pattern: '^uc_[0-9A-HJKMNP-TV-Z]{26}$'
+      description: Prefixed use-case id.
+
+    UseCaseCategory:
+      type: string
+      enum: [credit, advice, fraud, collections, other]
+
+    UseCaseStatus:
+      type: string
+      enum: [draft, in_review, sandboxed, production, revoked]
+
+    CoverageGap:
+      type: string
+      enum: [gender, language, geography, informal_sector, thin_file, other]
+
+    UseCase:
+      type: object
+      required: [id, providerId, category, title, status, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/UseCaseId'
+        providerId:
+          type: string
+          description: Licensed provider tenant or org id.
+        category:
+          $ref: '#/components/schemas/UseCaseCategory'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        status:
+          $ref: '#/components/schemas/UseCaseStatus'
+        coverageGaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageGap'
+        sandboxExpiresAt:
+          type: string
+          format: date-time
+          description: Present when status is sandboxed.
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    UseCaseCreateRequest:
+      type: object
+      required: [category, title]
+      properties:
+        category:
+          $ref: '#/components/schemas/UseCaseCategory'
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        coverageGaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageGap'
+
+    UseCaseUpdateRequest:
+      type: object
+      properties:
+        title:
+          type: string
+          minLength: 1
+          maxLength: 200
+        description:
+          type: string
+          maxLength: 4000
+        coverageGaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageGap'
+        status:
+          $ref: '#/components/schemas/UseCaseStatus'
+
+    UseCaseListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/UseCase'
+
+    UseCaseResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/UseCase'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    UseCaseListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/UseCaseListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

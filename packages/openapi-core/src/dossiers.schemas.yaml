@@ -1,0 +1,208 @@
+openapi: 3.1.0
+info:
+  title: Dossiers schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    DossierId:
+      type: string
+      pattern: '^dos_[0-9A-HJKMNP-TV-Z]{26}$'
+    ChecklistItemId:
+      type: string
+      pattern: '^cli_[0-9A-HJKMNP-TV-Z]{26}$'
+    LanguageTestId:
+      type: string
+      pattern: '^lt_[0-9A-HJKMNP-TV-Z]{26}$'
+    DossierStatus:
+      type: string
+      enum: [incomplete, submitted, accepted]
+    ChecklistItemStatus:
+      type: string
+      enum: [pending, complete, not_applicable]
+    CoverageGap:
+      type: string
+      enum: [gender, language, geography, informal_sector, thin_file, other]
+
+    ChecklistItem:
+      type: object
+      required: [id, dossierId, code, label, status]
+      properties:
+        id:
+          $ref: '#/components/schemas/ChecklistItemId'
+        dossierId:
+          $ref: '#/components/schemas/DossierId'
+        code:
+          type: string
+        label:
+          type: string
+        status:
+          $ref: '#/components/schemas/ChecklistItemStatus'
+        justification:
+          type: string
+          description: Required when status is not_applicable.
+        evidenceNote:
+          type: string
+
+    LanguageLiteracyTest:
+      type: object
+      required: [id, dossierId, language, channel, passed, testedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/LanguageTestId'
+        dossierId:
+          $ref: '#/components/schemas/DossierId'
+        language:
+          type: string
+        channel:
+          type: string
+          description: e.g. voice, chat, USSD
+        literacyConstraints:
+          type: string
+        passed:
+          type: boolean
+        testedAt:
+          type: string
+          format: date-time
+        scaleClaimUnlocked:
+          type: boolean
+          description: Nationwide scale claim allowed after pass (BR-7).
+
+    ReadinessDossier:
+      type: object
+      required: [id, useCaseId, status, completenessPct, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/DossierId'
+        useCaseId:
+          type: string
+        status:
+          $ref: '#/components/schemas/DossierStatus'
+        coverageGaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageGap'
+        dataProvenance:
+          type: string
+        thinFileNotes:
+          type: string
+        crossBorderMismatch:
+          type: boolean
+          description: HIC-trained model vs LMIC population (BR-8).
+        labourDisplacementNotes:
+          type: string
+          description: BR-9 labour-impact notes.
+        appealPathId:
+          type: string
+        completenessPct:
+          type: integer
+          minimum: 0
+          maximum: 100
+        checklistItems:
+          type: array
+          items:
+            $ref: '#/components/schemas/ChecklistItem'
+        languageTests:
+          type: array
+          items:
+            $ref: '#/components/schemas/LanguageLiteracyTest'
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ReadinessDossierCreateRequest:
+      type: object
+      required: [useCaseId]
+      properties:
+        useCaseId:
+          type: string
+        coverageGaps:
+          type: array
+          items:
+            $ref: '#/components/schemas/CoverageGap'
+        dataProvenance:
+          type: string
+        thinFileNotes:
+          type: string
+        crossBorderMismatch:
+          type: boolean
+        labourDisplacementNotes:
+          type: string
+        appealPathId:
+          type: string
+
+    ChecklistItemUpsertRequest:
+      type: object
+      required: [code, label, status]
+      properties:
+        code:
+          type: string
+        label:
+          type: string
+        status:
+          $ref: '#/components/schemas/ChecklistItemStatus'
+        justification:
+          type: string
+        evidenceNote:
+          type: string
+
+    LanguageTestCreateRequest:
+      type: object
+      required: [language, channel, passed]
+      properties:
+        language:
+          type: string
+        channel:
+          type: string
+        literacyConstraints:
+          type: string
+        passed:
+          type: boolean
+
+    ReadinessDossierListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadinessDossier'
+
+    ReadinessDossierResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ReadinessDossier'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    ReadinessDossierListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ReadinessDossierListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    ChecklistItemResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/ChecklistItem'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    LanguageLiteracyTestResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/LanguageLiteracyTest'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

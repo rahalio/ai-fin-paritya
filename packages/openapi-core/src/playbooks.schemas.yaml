@@ -1,0 +1,82 @@
+openapi: 3.1.0
+info:
+  title: Playbooks schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    PlaybookId:
+      type: string
+      pattern: '^pb_[0-9A-HJKMNP-TV-Z]{26}$'
+    PlaybookUseCaseType:
+      type: string
+      enum: [credit, advice, fraud, collections, other]
+
+    Playbook:
+      type: object
+      required: [id, title, useCaseType, anonymised, createdAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/PlaybookId'
+        title:
+          type: string
+        useCaseType:
+          $ref: '#/components/schemas/PlaybookUseCaseType'
+        summary:
+          type: string
+        bodyMarkdown:
+          type: string
+        regionHints:
+          type: array
+          items:
+            type: string
+        anonymised:
+          type: boolean
+          description: South-South sharing without firm secrets (BR-12).
+        createdAt:
+          type: string
+          format: date-time
+
+    PlaybookCreateRequest:
+      type: object
+      required: [title, useCaseType]
+      properties:
+        title:
+          type: string
+        useCaseType:
+          $ref: '#/components/schemas/PlaybookUseCaseType'
+        summary:
+          type: string
+        bodyMarkdown:
+          type: string
+        regionHints:
+          type: array
+          items:
+            type: string
+
+    PlaybookListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Playbook'
+
+    PlaybookResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Playbook'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    PlaybookListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/PlaybookListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

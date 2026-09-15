@@ -1,0 +1,101 @@
+openapi: 3.1.0
+info:
+  title: Cases schemas
+  version: 0.1.0
+paths: {}
+components:
+  schemas:
+    CaseId:
+      type: string
+      pattern: '^cas_[0-9A-HJKMNP-TV-Z]{26}$'
+    CaseType:
+      type: string
+      enum: [fairness_breach, appeal, sandbox_expiry]
+    CaseStatus:
+      type: string
+      enum: [open, investigating, closed]
+
+    Case:
+      type: object
+      required: [id, useCaseId, type, status, createdAt, updatedAt]
+      properties:
+        id:
+          $ref: '#/components/schemas/CaseId'
+        useCaseId:
+          type: string
+        type:
+          $ref: '#/components/schemas/CaseType'
+        status:
+          $ref: '#/components/schemas/CaseStatus'
+        title:
+          type: string
+        remediationNotes:
+          type: string
+        escalateRevoke:
+          type: boolean
+          description: Recommend revoke gate when remediation fails.
+        breachId:
+          type: string
+        assignedTo:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        closedAt:
+          type: string
+          format: date-time
+
+    CaseCreateRequest:
+      type: object
+      required: [useCaseId, type]
+      properties:
+        useCaseId:
+          type: string
+        type:
+          $ref: '#/components/schemas/CaseType'
+        title:
+          type: string
+        breachId:
+          type: string
+
+    CaseUpdateRequest:
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/CaseStatus'
+        remediationNotes:
+          type: string
+        escalateRevoke:
+          type: boolean
+        assignedTo:
+          type: string
+
+    CaseListData:
+      type: object
+      required: [items]
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Case'
+
+    CaseResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/Case'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta
+
+    CaseListResponse:
+      type: object
+      required: [data]
+      properties:
+        data:
+          $ref: '#/components/schemas/CaseListData'
+        meta:
+          $ref: ./common/envelopes.yaml#/components/schemas/ResponseMeta

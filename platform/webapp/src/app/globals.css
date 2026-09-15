@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --paritya-clay: #efe4d6;
+  --paritya-indigo: #2f3a8f;
+  --paritya-saffron: #c97b2d;
+  --paritya-monitor: #1f6b4a;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  color: #2f2419;
+  background:
+    radial-gradient(1200px 600px at 10% -10%, rgba(47, 58, 143, 0.12), transparent 55%),
+    radial-gradient(900px 500px at 90% 0%, rgba(201, 123, 45, 0.14), transparent 50%),
+    linear-gradient(180deg, #f7f1ea 0%, #efe4d6 45%, #e8dcc8 100%);
+}
+
+@keyframes stamp-in {
+  from {
+    transform: scale(1.15) rotate(-6deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+.stamp-in {
+  animation: stamp-in 420ms ease-out both;
+}
